@@ -1,0 +1,94 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_US.UTF-8
+  timezone: Etc/GMT
+
+  identity:
+    hostname: vagrant
+    password: '$6$tLgrQj4/DOs4ZkiY$lEq/sT4U8nvKx2PSpyLTsOjbcpMeRoD9qzCbt5fNVScdufQ7PXdhde7X5IKtvDqGTi2dq0ql4c9jEdF8Qw6wl.'
+    realname: vagrant
+    username: vagrant
+
+  early-commands:
+    # otherwise packer tries to connect and exceeds max attempts
+    # https://github.com/boxcutter/kvm/blob/main/ubuntu/iso/x86_64/ubuntu.pkr.hcl
+    - systemctl stop ssh.service
+    - systemctl stop ssh.socket
+  late-commands:
+    - echo 'vagrant ALL=(ALL:ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/vagrant
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  updates: security
+
+  storage:
+    swap:
+      size: 0
+#    layout:
+#      name: lvm
+    config:
+    # well this went deep in the weeds...
+      - type: disk
+        id: sda
+        path: /dev/sda
+        wipe: superblock-recursive
+        ptable: gpt
+        grub_device: true
+
+        # boot
+      - type: partition
+        id: sda1
+        device: sda
+        flag: bios_grub
+        size: 1MB
+      # - type: partition
+      #   device: sda
+      #   id: sda1
+      #   flag: boot
+      #   size: 256M
+
+        # lvm
+      - type: partition
+        device: sda
+        id: sda2
+        size: -1
+
+      - type: lvm_volgroup
+        id: vg0
+        name: vg0
+        devices:
+          - sda2
+
+        # root
+      - type: lvm_partition
+        id: lvm_root
+        name: root
+        volgroup: vg0
+        size: 5G
+      - type: format
+        id: lvm_root-fs
+        fstype: ext4
+        label: root
+        volume: lvm_root
+      - id: lvm_root-mount
+        type: mount
+        path: /
+        device: lvm_root-fs
+
+        # var
+      - type: lvm_partition
+        id: lvm_var
+        name: var
+        volgroup: vg0
+        size: 2G
+      - type: format
+        id: lvm_var-fs
+        fstype: ext4
+        label: var
+        volume: lvm_var
+      - id: lvm_var-mount
+        type: mount
+        path: /var
+        device: lvm_var-fs
