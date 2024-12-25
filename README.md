@@ -62,12 +62,12 @@ creates a 1 control node, 3 worker node k8s cluster
 
 # Certification Notes
 
-## [KCNA](https://www.cncf.io/training/certification/kcna/)
+## [K8s and Cloud Native Associate - KCNA](https://www.cncf.io/training/certification/kcna/)
 
 * The CNCF Landscape is very intimidating.
   * take time to become familiar with graduated projects.
 
-## [CKA](https://www.cncf.io/training/certification/cka/)
+## [k8s Administrator - CKA](https://www.cncf.io/training/certification/cka/)
 
 * killer.sh exam simulators included are invaluable for finding weak spots
 * Time and resource management.
@@ -82,3 +82,16 @@ creates a 1 control node, 3 worker node k8s cluster
     * 20% services and networking
     * 15% workloads and scheduling - the deep magic.
     * 10% storage
+  * cluster upgrade apply takes a very long time. 
+    * tmux and detach. flag the task, and come back after a few minutes.
+
+## [k8s Application Developer - CKAD]()
+
+* quite a bit of overlap from CKA.
+* time management - topics are more even in weighting.
+  * skip and flag time sinks
+
+## [Security Associate - KCSA]()
+
+## [Security Specialist - CKS]()
+
