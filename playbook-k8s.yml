@@ -38,12 +38,6 @@
         dest: /root/cluster_initialized.txt
       when: kubeadm_init_raw.changed
 
-    - name: copy admin kube config to host
-      fetch:
-        src: /etc/kubernetes/admin.conf
-        dest: shared
-      when: kubeadm_init_raw.changed
-
     - name: copy auth, install cni, ingress
       ansible.builtin.shell: |
         mkdir -p $HOME/.kube

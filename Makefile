@@ -6,15 +6,13 @@ python:
 	pip install -r requirements.txt
 
 vagrant:
-	echo 'rebuild vagrant env in 5 seconds'
-	sleep 5
 	vagrant destroy -f || true
 	vagrant up
 	vagrant ssh-config > ~/.ssh/vagrant.d/kubestronaut
 
 packer: output/ubuntu24.box
 
-output/ubuntu24.box: ubuntu24.pkr.hcl
+output/ubuntu24.box:
 	packer build -force ubuntu24.pkr.hcl
 	vagrant box add --name packer/ubuntu-24 output/packer/ubuntu24.box --force
 

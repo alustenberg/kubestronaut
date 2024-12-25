@@ -26,14 +26,14 @@ source "qemu" "ubuntu24" {
   accelerator       = "kvm"
   cpus              = 2
   disk_interface    = "virtio-scsi"
-  disk_size         = "10G"
+  disk_size         = "6G"
   disk_compression  = true
   format            = "qcow2"
   machine_type      = "q35"
   memory            = 4096
   net_device        = "virtio-net"
   output_directory  = "output/packer"
-  shutdown_command  = "echo 'vagrant' | sudo -S shutdown -P now"
+  shutdown_command  = "sudo -S shutdown -P now"
   efi_boot          = false
   qemuargs = [
     ["-cpu", "host"]
@@ -49,7 +49,7 @@ build {
   provisioner "shell" {
     execute_command="sudo -S env {{ .Vars }} {{ .Path }}"
     scripts = [
-      "scripts/provision.sh"
+      "scripts/packer.sh"
     ]
   }
   post-processor "vagrant" {

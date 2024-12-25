@@ -1,12 +1,7 @@
 #!/bin/bash
 
 set -x
-#set -e
-#set -o pipefail
 export DEBIAN_FRONTEND=noninteractive
-
-# setup base system and static runtime components
-#lvextend -r /dev/ubuntu-vg/ubuntu-lv /dev/vda3
 
 apt -y update
 apt -y upgrade

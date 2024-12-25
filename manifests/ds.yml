@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    type: daemon
+  name: daemon
+spec:
+  selector:
+    matchLabels:
+      type: daemon
+  template:
+    metadata:
+      labels:
+        type: daemon
+    spec:
+      containers:
+      - image: busybox:latest
+        name: daemon
+        args:
+        - sleep
+        - inf

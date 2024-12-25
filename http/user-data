@@ -38,21 +38,21 @@ autoinstall:
         grub_device: true
 
         # boot
+        # this is a funky shim to allow gpt partitions to boot from non EFI bios
+        # the normal MBR overlaps, so grub needs a 1M shim parition to bootstrap
+        # upside is we no longer need a dedicated /boot!
       - type: partition
         id: sda1
         device: sda
         flag: bios_grub
         size: 1MB
-      # - type: partition
-      #   device: sda
-      #   id: sda1
-      #   flag: boot
-      #   size: 256M
 
         # lvm
       - type: partition
         device: sda
         id: sda2
+        # remainder of disk
+        # tightly coupled with disk_size over in vagrantfile
         size: -1
 
       - type: lvm_volgroup
@@ -66,7 +66,7 @@ autoinstall:
         id: lvm_root
         name: root
         volgroup: vg0
-        size: 5G
+        size: 3G
       - type: format
         id: lvm_root-fs
         fstype: ext4

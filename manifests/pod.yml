@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: daemon
+  name: box
+spec:
+  containers:
+  - args:
+    - sleep
+    - inf
+    image: busybox:latest
+    name: daemon
+  nodeSelector:
+    kind: special
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"

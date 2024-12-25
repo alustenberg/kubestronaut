@@ -14,6 +14,15 @@ Vagrant.configure("2") do |config|
   config.vm.box = boxes['box']
   config.vm.synced_folder '.', '/vagrant', disabled: true
 
+  config.vm.provision "shell", path: "scripts/vagrant.sh"
+  # https://serverfault.com/a/702754
+  config.vm.provision "shell" do |s|
+    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    s.inline = <<-SHELL
+      echo #{ssh_pub_key} > /root/.ssh/authorized_keys
+    SHELL
+  end
+
   BOXES.each_with_index do |(k,v),idx1|
     groups[k] = []
     (1..v['count']).each do |i|
@@ -31,9 +40,8 @@ Vagrant.configure("2") do |config|
         # on last machine, run ansible global
         if idx1 == BOXES.size - 1 and i == v['count']
           node.vm.provision "ansible" do |ansible|
-            ansible.playbook="playbook-site.yml"
+            ansible.playbook="playbook-k8s.yml"
             ansible.limit="all"
-            ansible.extra_vars = { ansible_python_interpreter:"/usr/bin/python3" }
             ansible.groups = groups
             ansible.become = true
           end
