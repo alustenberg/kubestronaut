@@ -1,0 +1,19 @@
+---
+- name: update hosts file
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ hostvars[item].ansible_eth1.ipv4.address }} {{ item }}"
+    regexp: '.*{{ item }}$'
+  loop: "{{ groups.all }}"
+
+- name: update host name
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: disable swap fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  loop:
+    - /swap.img

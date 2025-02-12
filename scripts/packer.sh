@@ -75,6 +75,7 @@ apt -y install \
 
 systemctl disable --now kubelet
 systemctl disable --now etcd
+rm -rfv /var/lib/etcd/default
 
 mkdir /etc/containerd
 containerd config default | sed '/SystemdCgroup/s/false/true/' > /etc/containerd/config.toml

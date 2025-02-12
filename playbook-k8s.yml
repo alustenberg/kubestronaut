@@ -2,30 +2,18 @@
 
 - hosts: all
   any_errors_fatal: true
-
-  tasks:
-    - name: update hosts file
-      lineinfile:
-        dest: /etc/hosts
-        line: "{{ hostvars[item].ansible_eth1.ipv4.address }} {{ item }}"
-        regexp: '.*{{ item }}$'
-      loop: "{{ groups.all }}"
-
-    - name: update host name
-      hostname:
-        name: "{{ inventory_hostname }}"
-
-    - name: disable swap fstab
-      mount:
-        name: "{{ item }}"
-        fstype: swap
-        state: absent
-      loop:
-        - /swap.img
+  roles:
+    - k8s_common
 
 - hosts: control[0]
   any_errors_fatal: true
   tasks:
+    - name: kubelet service
+      service:
+        name: kubelet
+        enabled: yes
+        state: started
+
     - name: initialize the cluster
       command: 'kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_eth1.ipv4.address }}'
       args:
@@ -70,6 +58,12 @@
   vars:
     join_command: "{{ hostvars['vagrant-control-01'].join_command }}"
   tasks:
+    - name: kubelet service
+      service:
+        name: kubelet
+        enabled: yes
+        state: started
+
     - name: join cluster
       command: "{{ join_command }}"
       args:

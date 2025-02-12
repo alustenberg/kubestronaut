@@ -1,0 +1,4 @@
+- 1 CKS - Split etcd to dedicated machines
+- 2 Hook for test harness?
+- 5 other packages to purge on base vm?
+- 5 restore apparmour?
