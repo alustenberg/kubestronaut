@@ -69,7 +69,12 @@ apt -y install \
     kubeadm \
     kubectl \
     kubelet \
+    etcd-server \
+    etcd-client \
     ;
+
+systemctl disable --now kubelet
+systemctl disable --now etcd
 
 mkdir /etc/containerd
 containerd config default | sed '/SystemdCgroup/s/false/true/' > /etc/containerd/config.toml
@@ -82,6 +87,9 @@ chown vagrant.vagrant /home/vagrant/.ssh
 chmod 600 /home/vagrant/.ssh/authorized_keys
 
 # clean up
+# manual list
+# kernel discovery
+# -dev discovery
 (
 cat <<EOF
 apparmor

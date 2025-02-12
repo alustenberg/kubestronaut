@@ -3,17 +3,36 @@
 box: 'packer/ubuntu-24'
 prefix: '10.50.1'
 
-# 18GB ram, 9 cpus
 boxes:
+# 2G + 2G + 16G
+# 2 + 2 + 12 cpu
   control:
     count: 1
     memory: 2048
     cpu: 2
     disk: 10
     offset: 10
+  etc:
+    count: 1
+    memory: 2048
+    cpu: 2
+    disk: 10
+    offset: 20
   worker:
     count: 3
     memory: 4096
     cpu: 4
     disk: 20
-    offset: 20
+    offset: 30
+
+# 6G + 6G + 20G
+# 6 + 6 + 20 cpu
+profiles:
+  default: {}
+  full:
+    control:
+      count: 3
+    etc:
+      count: 5
+    worker:
+      count: 5

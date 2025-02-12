@@ -9,6 +9,7 @@ groups = {}
 
 PREFIX = boxes['prefix']
 BOXES = boxes['boxes']
+PROFILE = boxes['profiles'][ ENV['VAGRANT_K8S_PROFILE'] || 'default' ]
 
 Vagrant.configure("2") do |config|
   config.vm.box = boxes['box']
@@ -24,6 +25,10 @@ Vagrant.configure("2") do |config|
   end
 
   BOXES.each_with_index do |(k,v),idx1|
+    if PROFILE.has_key?(k)
+      v.merge!(PROFILE[k])
+    end
+
     groups[k] = []
     (1..v['count']).each do |i|
       hostname = "vagrant-#{ k }-#{'%02d' % (i)}"
