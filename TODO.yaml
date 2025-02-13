@@ -1,5 +1,6 @@
 - 1 CKS - Split etcd to dedicated machines
-- 2 Hook for test harness?
-- 2 set up proper CA chain
-- 5 other packages to purge on base vm?
+- 1 CKS - Swap out CNI for something that supports policy
+- 2 set up proper CA chain?
+- 3 Hook for test harness?
+- 4 other packages to purge on base vm?
 - 5 restore apparmour?

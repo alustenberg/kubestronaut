@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -x
+#set -x
+
 export DEBIAN_FRONTEND=noninteractive
 
 cat <<EOF | cat >> /etc/dpkg/dpkg.cfg.d/excludes
@@ -127,8 +128,8 @@ chown vagrant.vagrant /home/vagrant/.ssh
 chmod 600 /home/vagrant/.ssh/authorized_keys
 
 # clean up before image creation
-apt-get -y autoremove;
-apt-get -y clean;
+apt -y autoremove
+apt -y clean all
 
 rm -f /root/.wget-hsts
 rm -f /var/lib/systemd/random-seed
@@ -143,3 +144,5 @@ truncate -s 0 /var/lib/dbus/machine-id
 
 fstrim -a
 export HISTSIZE=0
+
+du -mxcd4 / /var | sort -nr | head -n 50

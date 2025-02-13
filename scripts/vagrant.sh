@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -x
+
 export DEBIAN_FRONTEND=noninteractive
 export HISTSIZE=0
 
