@@ -2,7 +2,7 @@
 
 This is my working directory for completing the [CNCF Kubestronaut](https://www.cncf.io/training/kubestronaut/) certification package.
 
-## Sources
+## Sources and Commit History
 
 This is not a pretty portfolio, it's getting things done dirty.
 
@@ -12,7 +12,9 @@ sources and inspirations include, but are not limited to:
 * https://github.com/boxcutter/kvm/
 * https://github.com/chef/bento
 
-When snippets are pulled from repo issues, they are commented inline with references
+When snippets are pulled from repo issues, they are commented inline with references.
+
+Branches are squashed, because save scumming is not a sin.
 
 ## Environment
 
