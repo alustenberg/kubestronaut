@@ -1,0 +1,26 @@
+---
+
+- hosts: all
+  any_errors_fatal: true
+  roles:
+    - common
+
+- hosts: etcd
+  any_errors_fatal: true
+  roles:
+    - k8s_etcd
+
+- hosts: control:worker
+  any_errors_fatal: true
+  roles:
+    - k8s_common
+
+- hosts: control
+  any_errors_fatal: true
+  roles:
+    - k8s_control
+
+- hosts: worker
+  any_errors_fatal: true
+  roles:
+    - k8s_worker

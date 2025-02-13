@@ -1,0 +1,16 @@
+---
+- name: kubelet service
+  service:
+    name: kubelet
+    enabled: yes
+    state: started
+
+- name: bootstrap first node
+  import_tasks: bootstrap.yaml
+  when:
+    - 'inventory_hostname == groups["control"][0]'
+
+- name: add secondary nodes
+  import_tasks: cluster.yaml
+  when:
+    - 'inventory_hostname != groups["control"][0]'

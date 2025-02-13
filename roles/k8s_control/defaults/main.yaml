@@ -1,0 +1,2 @@
+---
+kube_vip_image: ghcr.io/kube-vip/kube-vip:v0.8.9

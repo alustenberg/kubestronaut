@@ -1,0 +1,34 @@
+---
+- name: set facts
+  set_fact:
+    keepalive_state: MASTER
+    keepalive_priority: 101
+  when:
+    - 'inventory_hostname == groups["control"][0]'
+
+- name: static pod resource dir
+  file:
+    path: '/etc/kubernetes/assets'
+    state: directory
+    owner: root
+    group: root
+    mode: o+x,a+rx,-w
+
+- name: kubelet templates
+  template:
+    src: '{{ item }}.j2'
+    dest: '/etc/kubernetes/{{ item }}'
+    owner: root
+    group: root
+  with_items:
+    - 'manifests/keepalived.yaml'
+    - 'manifests/haproxy.yaml'
+    - 'assets/keepalived.conf'
+    - 'assets/check_apiserver.sh'
+    - 'assets/haproxy.cfg'
+
+- name: kubelet service
+  service:
+    name: kubelet
+    enabled: yes
+    state: started
