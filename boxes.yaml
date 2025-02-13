@@ -13,7 +13,7 @@ boxes:
     disk: 10
     offset: 10
   etc:
-    count: 1
+    count: 0
     memory: 2048
     cpu: 2
     disk: 10
@@ -32,7 +32,5 @@ profiles:
   full:
     control:
       count: 3
-    etc:
-      count: 5
     worker:
       count: 5

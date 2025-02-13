@@ -1,0 +1,7 @@
+---
+keepalive_id: LVS_VAGRANT
+keepalive_router_id: 52
+keepalive_state: BACKUP
+keepalive_interface: eth1
+keepalive_priority: 100
+keepalive_pass: vagrant

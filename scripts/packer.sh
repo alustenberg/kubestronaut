@@ -3,6 +3,49 @@
 set -x
 export DEBIAN_FRONTEND=noninteractive
 
+cat <<EOF | cat >> /etc/dpkg/dpkg.cfg.d/excludes
+path-exclude=/lib/firmware/*
+path-exclude=/usr/share/doc/*
+path-exclude=/etc/update-motd.d/
+EOF
+
+rm -rf /etc/update-motd.d/*
+rm -rf /lib/firmware/*
+rm -rf /usr/share/doc/*
+
+systemctl disable --now apparmor
+
+# clean up up front
+# manual list
+# kernel discovery
+# -dev discovery
+(
+cat <<EOF
+apparmor
+command-not-found
+fonts-ubuntu-console
+friendly-recovery
+grub-legacy-ec2
+laptop-detect
+libx11-6
+libx11-data
+libxcb1
+libxext6
+libxmuu1
+motd-news-config
+popularity-contest
+ppp
+pppconfig
+pppoeconf
+usbutils
+xauth
+EOF
+
+dpkg --list | awk '{ print $2 }' | egrep 'linux-headers|linux-image-.*-generic|linux-modules-.*-generic|linux-source|-doc$' | grep -v "$(uname -r)"
+dpkg --list | awk '{ print $2 }' | grep -- '-dev\(:[a-z0-9]\+\)\?$' | grep -v 'systemd-dev'
+) | sort | uniq | xargs apt purge -y
+
+# begin the normal base image stuff
 apt -y update
 apt -y upgrade
 apt -y install \
@@ -10,6 +53,8 @@ apt -y install \
     bash-completion \
     curl \
     gpg \
+    haproxy \
+    keepalived \
     locate \
     net-tools \
     nfs-common \
@@ -53,7 +98,6 @@ network:
 EOF
 
 timedatectl set-ntp true
-systemctl disable --now apparmor
 systemctl enable  --now systemd-timesyncd
 
 
@@ -69,15 +113,10 @@ apt -y install \
     kubeadm \
     kubectl \
     kubelet \
-    etcd-server \
-    etcd-client \
     ;
 
-systemctl disable --now kubelet
-systemctl disable --now etcd
-rm -rfv /var/lib/etcd/default
-
 mkdir /etc/containerd
+
 containerd config default | sed '/SystemdCgroup/s/false/true/' > /etc/containerd/config.toml
 systemctl enable  --now containerd
 
@@ -87,50 +126,14 @@ curl https://raw.githubusercontent.com/hashicorp/vagrant/refs/heads/main/keys/va
 chown vagrant.vagrant /home/vagrant/.ssh
 chmod 600 /home/vagrant/.ssh/authorized_keys
 
-# clean up
-# manual list
-# kernel discovery
-# -dev discovery
-(
-cat <<EOF
-apparmor
-command-not-found
-fonts-ubuntu-console
-friendly-recovery
-grub-legacy-ec2
-laptop-detect
-libx11-6
-libx11-data
-libxcb1
-libxext6
-libxmuu1
-motd-news-config
-popularity-contest
-ppp
-pppconfig
-pppoeconf
-usbutils
-xauth
-EOF
-
-dpkg --list | awk '{ print $2 }' | egrep 'linux-headers|linux-image-.*-generic|linux-modules-.*-generic|linux-source|-doc$' | grep -v "$(uname -r)"
-dpkg --list | awk '{ print $2 }' | grep -- '-dev\(:[a-z0-9]\+\)\?$' | grep -v 'systemd-dev'
-) | sort | uniq | xargs apt purge -y
-
-cat <<EOF | cat >> /etc/dpkg/dpkg.cfg.d/excludes
-path-exclude=/lib/firmware/*
-path-exclude=/usr/share/doc/linux-firmware/*
-EOF
-
+# clean up before image creation
 apt-get -y autoremove;
 apt-get -y clean;
 
 rm -f /root/.wget-hsts
 rm -f /var/lib/systemd/random-seed
-rm -rf /lib/firmware/*
+rm -rf /etc/update-motd.d/
 rm -rf /tmp/* /var/tmp/*
-rm -rf /usr/share/doc/*
-rm -rf /usr/share/doc/linux-firmware/*
 
 find /var/cache -type f -delete;
 find /var/log -type f -exec truncate --size=0 {} \;
@@ -139,5 +142,4 @@ truncate -s 0 /etc/machine-id
 truncate -s 0 /var/lib/dbus/machine-id
 
 fstrim -a
-
 export HISTSIZE=0

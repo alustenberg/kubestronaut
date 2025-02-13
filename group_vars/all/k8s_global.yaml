@@ -1,0 +1,7 @@
+---
+# used by control and workers
+kube_vip_image: ghcr.io/kube-vip/kube-vip:v0.8.9
+kube_vip_name: vip.local
+kube_vip_address: 10.50.1.2
+kube_vip_port_src: 6443
+kube_vip_port_dst: 8443

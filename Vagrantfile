@@ -4,7 +4,7 @@
 require 'yaml'
 
 # https://blog.scottlowe.org/2016/01/14/improved-way-yaml-vagrant/
-boxes = YAML.load_file(File.join(File.dirname(__FILE__), 'boxes.yml'))
+boxes = YAML.load_file(File.join(File.dirname(__FILE__), 'boxes.yaml'))
 groups = {}
 
 PREFIX = boxes['prefix']
@@ -45,10 +45,9 @@ Vagrant.configure("2") do |config|
         # on last machine, run ansible global
         if idx1 == BOXES.size - 1 and i == v['count']
           node.vm.provision "ansible" do |ansible|
-            ansible.playbook="playbook-k8s.yml"
+            ansible.playbook="playbook-k8s.yaml"
             ansible.limit="all"
             ansible.groups = groups
-            ansible.become = true
           end
         end
       end

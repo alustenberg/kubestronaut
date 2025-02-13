@@ -6,6 +6,12 @@
     regexp: '.*{{ item }}$'
   loop: "{{ groups.all }}"
 
+- name: update hosts file vip
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ kube_vip_address }} {{ kube_vip_name }}"
+    regexp: '.*{{ kube_vip_name }}$'
+
 - name: update host name
   hostname:
     name: "{{ inventory_hostname }}"
