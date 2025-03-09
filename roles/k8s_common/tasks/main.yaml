@@ -1,0 +1,13 @@
+---
+
+- name: install haproxy
+  import_tasks: haproxy.yaml
+
+- name: install keepalived
+  import_tasks: keepalived.yaml
+
+- name: kubelet service
+  service:
+    name: kubelet
+    enabled: yes
+    state: started

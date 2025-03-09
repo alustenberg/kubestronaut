@@ -1,0 +1,43 @@
+# /etc/haproxy/haproxy.cfg
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    log stdout format raw local0
+    daemon
+
+defaults
+    mode                    http
+    log                     global
+    option                  httplog
+    option                  dontlognull
+    option http-server-close
+    option forwardfor       except 127.0.0.0/8
+    option                  redispatch
+    retries                 1
+    timeout http-request    10s
+    timeout queue           20s
+    timeout connect         5s
+    timeout client          35s
+    timeout server          35s
+    timeout http-keep-alive 10s
+    timeout check           10s
+
+frontend apiserver
+    bind *:{{ kube_vip_port_dst }}
+    mode tcp
+    option tcplog
+    default_backend apiserverbackend
+
+backend apiserverbackend
+    option httpchk
+
+    http-check connect ssl
+    http-check send meth GET uri /healthz
+    http-check expect status 200
+
+    mode tcp
+    balance     roundrobin
+{% for h in groups['control'] %}
+    server {{ h }} {{ hostvars[h].ansible_eth1.ipv4.address}}:{{ kube_vip_port_src }} check verify none
+{% endfor %}

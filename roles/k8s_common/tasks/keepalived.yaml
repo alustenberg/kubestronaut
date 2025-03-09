@@ -1,0 +1,30 @@
+---
+
+- name: set facts
+  set_fact:
+    keepalive_state: MASTER
+    keepalive_priority: 101
+  when:
+    - 'inventory_hostname == groups["control"][0]'
+
+- name: install keepalived
+  apt:
+    name:
+      - keepalived
+
+- name: keepalive config
+  template:
+    src: '{{ item }}.j2'
+    dest: '/etc/keepalived/{{ item }}'
+    owner: root
+    group: root
+  with_items:
+    - keepalived.conf
+    - check_apiserver.sh
+
+- name: keepalive service
+  service:
+    name: keepalived
+    state: restarted
+    enabled: yes
+

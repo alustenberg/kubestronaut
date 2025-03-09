@@ -1,0 +1,44 @@
+- name: initialize the cluster
+  command: 'kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_eth1.ipv4.address }} --apiserver-bind-port={{ kube_vip_port_src }} --control-plane-endpoint={{ kube_vip_address }}:{{ kube_vip_port_dst }} --upload-certs'
+  args:
+    creates: /root/cluster_initialized.txt
+  register: kubeadm_init_raw
+
+- name: save kubeadm init output to a file
+  copy:
+    content: "stdout:\n{{ kubeadm_init_raw.stdout }}\n\nstderr:\n{{ kubeadm_init_raw.stderr }}"
+    dest: /root/cluster_initialized.txt
+  when: kubeadm_init_raw.changed
+
+- name: copy auth, install cni, ingress
+  ansible.builtin.shell: 
+    cmd: |
+      cd /root
+      mkdir -p .kube
+      cp -i /etc/kubernetes/admin.conf .kube/config
+
+      wget -q https://github.com/projectcalico/calico/releases/download/v3.29.2/calicoctl-linux-amd64 -O calicoctl
+      chmod +x calicoctl
+
+      wget -q https://raw.githubusercontent.com/projectcalico/calico/v3.29.2/manifests/calico.yaml
+      kubectl create -f calico.yaml
+  become: true
+  args:
+    creates: /root/k8s_cni_initialized.txt
+  register: k8s_cni_init_raw
+
+- name: save cni init output to a file
+  copy:
+    content: "stdout:\n{{ k8s_cni_init_raw.stdout }}\n\nstderr:\n{{ k8s_cni_init_raw.stderr }}"
+    dest: /root/k8s_cni_initialized.txt
+  when: k8s_cni_init_raw.changed
+
+- name: get join command
+  shell: grep -B2 -- '--control-plane --certificate-key' /root/cluster_initialized.txt | sed -e 's/^[\t ]*//;s/\\$//';
+  register: join_command_raw
+  changed_when: no
+
+- name: set join commands
+  set_fact:
+    worker_join_command: "{{ join_command_raw.stdout_lines[0:2] | join('') }}"
+    control_join_command: "{{ join_command_raw.stdout_lines | join('') }}"
